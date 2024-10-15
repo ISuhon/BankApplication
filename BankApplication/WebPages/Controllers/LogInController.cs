@@ -1,19 +1,19 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using BankApplication.Interfaces;
-using BankApplication.Client;
+﻿using BankApplication.Client;
 using BankApplication.DataBase;
+using BankApplication.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BankApplication.WebPages.Controllers
 {
-    public class RegisterController : Controller
+    public class LogInController : Controller
     {
         private readonly BankContext _context;
 
-        public RegisterController(BankContext context)
+        public LogInController(BankContext context)
         {
             this._context = context;
         }
-        public IActionResult Register(IClientData client)
+        public IActionResult LogIn(IClientData client)
         {
             if (_context.Clients.FirstOrDefault(c => c.PhoneNumber == client.PhoneNumber) != null)
             {
@@ -34,7 +34,7 @@ namespace BankApplication.WebPages.Controllers
                 LastName = client.LastName,
                 PhoneNumber = client.PhoneNumber,
                 Email = client.Email,
-                Balance = new ClientBalance()
+                ClientBalance = client.ClientBalance
             };
 
             _context.Clients.Add(newClient);

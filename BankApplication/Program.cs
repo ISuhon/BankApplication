@@ -1,34 +1,51 @@
 using BankApplication.Middleware;
-public class Program {
+using BankApplication.Client;
+using BankApplication.DataBase;
+using BankApplication.Interfaces;
+using BankApplication.Migrations;
+using BankApplication.Services;
+using BankApplication.WebPages;
+using Microsoft.EntityFrameworkCore;
 
-    public void Configure(IApplicationBuilder appBuilder, IWebHostEnvironment env)
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddRazorPages();
+builder.Services.AddDbContext(builder.Configuration);
+builder.Services.AddServices();
+
+var app =  builder.Build();
+
+app.MapGet("/", () =>
+{
+    return Results.Redirect("Index");
+});
+
+app.MapPost("/SignUp", async (HttpContext context, IClients clients) =>
+{
+    var form = await context.Request.ReadFormAsync();
+
+    string firstName = form["FirstName"]!;
+    string middleName = form["MiddleName"]!;
+    string lastName = form["LastName"]!;
+    string phoneNumber = form["PhoneNumber"]!;
+    string email = form["Email"]!;
+
+    var newClient = new ClientData
     {
-        if (env.IsDevelopment())
-        {
-            appBuilder.UseDeveloperExceptionPage();
-        }
+        FirstName = firstName,
+        MiddleName = middleName,
+        LastName = lastName,
+        PhoneNumber = phoneNumber,
+        Email = email,
+        Balance = new ClientBalance()
+    };
 
-        // Додаємо наші кастомні middleware в конвеєр
-        appBuilder.UseMiddleware<CreditCardMiddlware>();
-        appBuilder.UseMiddleware<PostRequest>();
+    await clients.AddNewClient(newClient);
 
-        // Додаємо middleware за замовчуванням (якщо потрібно)
-        appBuilder.UseRouting();
+    return Results.Redirect("/Index");
+});
 
-        appBuilder.UseEndpoints(endpoints =>
-        {
-            endpoints.MapGet("/", async context =>
-            {
-                await context.Response.WriteAsync("Головна сторінка");
-            });
-        });
+app.UseMiddleware<CreditCardMiddlware>();
 
-        var builder = WebApplication.CreateBuilder(args);
-        var app = builder.Build();
+app.MapRazorPages();
 
-        app.MapGet("/", () => "Hello World!");
-
-        app.Run();
-    }
-    
-}
+app.Run();
