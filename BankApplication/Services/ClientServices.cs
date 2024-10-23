@@ -5,7 +5,7 @@ using System.Data.Entity;
 
 namespace BankApplication.Services
 {
-    public class ClientServices : IClients
+    public class ClientServices : IClientService
     {
         private readonly BankContext _context;
 
@@ -23,7 +23,7 @@ namespace BankApplication.Services
                 LastName = client.LastName,
                 PhoneNumber = client.PhoneNumber,
                 Email = client.Email,
-                Balance = new ClientBalance()
+                Balance = new ClientBalance(client.LastName)
             };
 
             await this._context.Clients.AddAsync(newClient);

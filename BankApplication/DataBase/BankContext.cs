@@ -17,7 +17,10 @@ namespace BankApplication.DataBase
         public DbSet<ClientCreditCard> CreditCards => Set<ClientCreditCard>();
         public DbSet<CreditData> Credits => Set<CreditData>();
         public DbSet<Transaction> Transactions => Set<Transaction>();
-        public BankContext(DbContextOptions<BankContext> options) : base(options) { }
+        public BankContext(DbContextOptions<BankContext> options) : base(options) 
+        { 
+            Database.EnsureCreated();
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

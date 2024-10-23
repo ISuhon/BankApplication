@@ -78,6 +78,9 @@ namespace BankApplication.Client
 
         [MaxLength(50)]
         public string? Email { get; set; }
+
+        public string? Password { get; set; }
+
         [NotMapped]
         public IClientBalance? ClientBalance { get; set; }
 

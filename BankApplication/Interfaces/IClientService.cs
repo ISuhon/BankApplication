@@ -1,6 +1,6 @@
 ﻿namespace BankApplication.Interfaces
 {
-    public interface IClients
+    public interface IClientService
     {
         public Task<IClientData> GetClientById(int id);
 

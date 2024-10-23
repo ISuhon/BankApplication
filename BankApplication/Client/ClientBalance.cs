@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BankApplication.Client;
 
 namespace BankApplication.Client
 {
@@ -30,6 +31,14 @@ namespace BankApplication.Client
 
         public ClientBalance()
         {
+            this.CreditCardsForDB = creditCards?.getCreditCards().Cast<ClientCreditCard>().ToList();
+            this.CreditsForDB = Credits?.getCredits().Cast<CreditData>().ToList();
+        }
+
+        public ClientBalance(string surname)
+        {
+            this.Surname = surname;
+            this.creditCards = creditCards;
             this.CreditCardsForDB = creditCards?.getCreditCards().Cast<ClientCreditCard>().ToList();
             this.CreditsForDB = Credits?.getCredits().Cast<CreditData>().ToList();
         }

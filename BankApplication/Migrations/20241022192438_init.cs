@@ -35,6 +35,7 @@ namespace BankApplication.Migrations
                     LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BalanceId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>

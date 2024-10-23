@@ -1,23 +1,31 @@
-﻿using BankApplication.Interfaces;
+﻿using BankApplication.DataBase;
+using BankApplication.Interfaces;
+using BankApplication.Services;
 
 namespace BankApplication.Middleware
 {
-    public class CreditCardMiddlware
+    public class ClientMiddleware
     {
         private readonly RequestDelegate _next;
 
-        public CreditCardMiddlware(RequestDelegate next)
+        public ClientMiddleware(RequestDelegate next)
         {
-            _next = next;
+            this._next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, ICreditCard clientCreditCard)
+        public async Task InvokeAsync(HttpContext context, ICreditCardService creditCardService)
         {
-            if (context.Request.Method == "/Credit_card")
+            if (context.User.Identity!.IsAuthenticated)
             {
-                var creditCard = clientCreditCard;
+                var clientId = context.User.Claims.FirstOrDefault(c => c.Type == "ClientId")?.Value;
 
-                string html = """
+                if (clientId != null && context.Request.Path == "/Credit_card")
+                {
+                    var creditCard = creditCardService.GetCreditCardForClient(int.Parse(clientId));
+
+                    if (creditCard != null)
+                    {
+                        string html = """
                         <html>
                         <head>
                             <title> Client credit card</title>
@@ -113,28 +121,27 @@ namespace BankApplication.Middleware
 
                                 document.getElementById('credit-card').addEventListener('click', () => {
                                     if (cardNumber.style.display !== 'none') {
-                                        cardNumber.style.display = 'none';  // Приховуємо div2
+                                        cardNumber.style.display = 'none';
                                         expirationDate.style.display = 'none';
                                         fortune.style.display = 'none'
-                                        cvvCode.style.display = 'block'; // Відображаємо div3
+                                        cvvCode.style.display = 'block';
                                     } else {
-                                        cardNumber.style.display = 'block';  // Приховуємо div2
+                                        cardNumber.style.display = 'block';
                                         expirationDate.style.display = 'block';
                                         fortune.style.display = 'block'
-                                        cvvCode.style.display = 'none'; // Відображаємо div3
+                                        cvvCode.style.display = 'none';
                                     }
                                 })
                             </script>
                         </body>
                     </html>
                     """;
-                context.Response.ContentType = "text/html";
-                await context.Response.WriteAsync(html);
+                        context.Response.ContentType = "text/html";
+                        await context.Response.WriteAsync(html);
+                    }
+                }
             }
-            else
-            {
-                await _next(context);
-            }
+            await _next(context);
         }
     }
 }
